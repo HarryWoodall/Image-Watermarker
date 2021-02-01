@@ -1,0 +1,26 @@
+{
+  "name": "watermark",
+  "version": "1.0.0",
+  "description": "Batch edit images to add watermark",
+  "main": "index.js",
+  "bin": "bin.js",
+  "dependencies": {
+    "canvas": "^2.6.1",
+    "image-size": "^0.9.3",
+    "prompt-sync": "^4.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Teziokz/Image-Watermarker.git"
+  },
+  "author": "Harry Woodall",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Teziokz/Image-Watermarker/issues"
+  },
+  "homepage": "https://github.com/Teziokz/Image-Watermarker#readme"
+}

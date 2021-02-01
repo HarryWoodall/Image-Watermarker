@@ -1,0 +1,16 @@
+{
+  "data": {
+    "font": "60px Arial",
+    "color": "#ffffff",
+    "transparency": 60,
+    "text": "Stockport Council",
+    "xOffset": 0,
+    "yOffset": 0,
+    "rotation": 0,
+    "sourceDirectory": "Images",
+    "destinationDirectory": "Destination"
+  },
+  "resetLogs": true,
+  "overideFiles": false,
+  "files": []
+}

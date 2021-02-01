@@ -1,18 +1,29 @@
 fs = require('fs');
 const sizeOf = require('image-size');
 const { createCanvas, loadImage } = require('canvas');
+const prompt = require('prompt-sync')();
 
 //Config
-const font = '60px Arial';
-const color = "#ffffff";
-const transparency = 60;
-const text = "Stockport Council";
-const xOffset = 0;
-const yOffset = 0;
-const rotation = 0;
-const sourceDirectory = "Images";
-const distinationDirectory = "Destination";
+const config = JSON.parse(fs.readFileSync('./config.json'));
+if (!config) {
+  console.log("Config file not foud, please make sure 'config.json' exists.");
+  return;
+}
 
+const font = config.data.font;
+const color = config.data.color;
+const transparency = config.data.transparency;
+const text = config.data.text;
+const xOffset = config.data.xOffset;
+const yOffset = config.data.yOffset;
+const rotation = config.data.rotation;
+const sourceDirectory = config.data.sourceDirectory;
+const destinationDirectory = config.data.destinationDirectory;
+
+
+if (config.resetLogs) {
+  resetProgressLogs();
+}
 const args = process.argv.slice(2);
 args.forEach(arg => {
   switch(arg) {
@@ -22,15 +33,15 @@ args.forEach(arg => {
   }
 });
 
-// setFiles(
-//   ["432010"]
-// );
+if (config.overideFiles) {
+  setFiles(config.files);
+}
 
 // Setup
-const progressData = JSON.parse(fs.readFileSync('./data.json')); 
+const progressData = JSON.parse(fs.readFileSync('./logs.json')); 
 if (progressData.filesRemaining.length <= 0 && progressData.filesDone.length <= 0) {
   progressData.filesRemaining = fs.readdirSync(`./${sourceDirectory}`);
-  fs.writeFileSync('./data.json', JSON.stringify(progressData));
+  fs.writeFileSync('./logs.json', JSON.stringify(progressData, false, 2));
 }
 
 if (progressData.fileInProgress) {
@@ -43,17 +54,15 @@ if (progressData.filesRemaining.length > 0) {
     if (progressData.filesErrored.length) {
       progressData.filesErrored.forEach(file => {
         console.log(`ERROR: File ${file} was skipped, please check manually`);
-      }) 
+      });
+      prompt(); 
     } else {
-      console.log("Processing complete, no errors");
+      prompt("Processing complete, no errors");
     }
   });
 } else {
   console.log("No Files to Process");
 }
-
-
-
 
 
 async function processImages() {
@@ -69,12 +78,10 @@ async function processImages() {
       const ctx = canvas.getContext('2d');
 
       progressData.fileInProgress = progressData.filesRemaining.pop();
-      fs.writeFileSync('./data.json', JSON.stringify(progressData));
+      fs.writeFileSync('./logs.json', JSON.stringify(progressData, false, 2));
       
-      console.log(`Loading ${imageName}`);
       await loadImage(currentImageLocation).
       then((image) => {
-        console.log(`Processing ${imageName}`);
         ctx.drawImage(image, 0, 0);
         ctx.fillStyle = color + convertToHex(transparency);
         ctx.font = font
@@ -86,8 +93,7 @@ async function processImages() {
 
         progressData.filesDone.push(progressData.fileInProgress);
         progressData.fileInProgress = "";
-        fs.writeFileSync('./data.json', JSON.stringify(progressData));
-        console.log(`Logs updated`);
+        fs.writeFileSync('./logs.json', JSON.stringify(progressData, false, 2));
         console.log(`${Math.round(progressData.filesDone.length / (progressData.filesRemaining.length + progressData.filesDone.length) * 100)}% complete\n`);
       })
       .catch(error => {
@@ -108,7 +114,7 @@ function resetProgressLogs() {
     fileInProgress: "",
     filesErrored: []
   }
-  fs.writeFileSync('./data.json', JSON.stringify(data));
+  fs.writeFileSync('./logs.json', JSON.stringify(data, false, 2));
 }
 
 function convertToHex(number) {
@@ -127,15 +133,18 @@ function setFiles(files) {
     files = files.map(file => {
       if (file.split(".").pop() !== "jpg") {
         return file += ".jpg";
+      } else {
+        return file;
       }
     });
+    console.log(files);
     let data = {
       filesRemaining: files,
       filesDone: [],
       fileInProgress: "",
       filesErrored: []
     }
-    fs.writeFileSync('./data.json', JSON.stringify(data));
+    fs.writeFileSync('./logs.json', JSON.stringify(data, false, 2));
   }
 }
 
