@@ -3,12 +3,6 @@
 ## Prerequisites
 Node is required to run this project.
 
-## Installing
-cd into the project folder
-````
-npm install
-````
-
 ## Running
 ### Complete run
  - Place the images you wish to watermark into the `Images` folder
