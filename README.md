@@ -13,7 +13,7 @@ Node is required to run this project.
  *Warning: If an image was in the middle of being processed, it will be skipped once the program resumes and an error will show once it has finnished.
 
 ## Config options
-
+The watermark can be modified using the config.json file
 ### Data
 The data for the watermark, the fields are: 
  - `font`: size and style of the watermark
