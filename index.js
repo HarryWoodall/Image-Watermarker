@@ -89,9 +89,9 @@ async function processImages() {
         ctx.drawImage(image, 0, 0);
         ctx.fillStyle = color + convertToHex(transparency);
         ctx.font = font
-        rotate(ctx, dimensions, [xOffset, yOffset], rotation);
         const textData = ctx.measureText(text);
         const textPosition = setPosition(textData, dimensions);
+        rotate(ctx, textPosition, textData);
         ctx.fillText(text,textPosition[0], textPosition[1]);
         fs.writeFileSync(imageDestination, canvas.toBuffer('image/jpeg')); 
         console.log(`${imageName} processed`);
@@ -111,10 +111,10 @@ async function processImages() {
   }
 }
 
-function rotate(ctx, dimensions, offsets, rotation) {
-  ctx.translate((dimensions.width / 2) + offsets[0], (dimensions.height / 2) + offsets[1]);
+function rotate(ctx, position, textData) {
+  ctx.translate(position[0] + textData.width / 2, position[1] - (textData.actualBoundingBoxAscent -  textData.actualBoundingBoxDescent) / 2);
   ctx.rotate(rotation * Math.PI / 180);
-  ctx.translate(-((dimensions.width / 2) + offsets[0]), -((dimensions.height / 2) + offsets[1]));
+  ctx.translate(-(position[0] + textData.width / 2), -(position[1] - (textData.actualBoundingBoxAscent -  textData.actualBoundingBoxDescent) / 2));
 }
 
 function setPosition(textData, dimensions) {
