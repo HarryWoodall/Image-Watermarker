@@ -69,7 +69,7 @@ async function processImages() {
   while(progressData.filesRemaining.length > 0) {
 
     const imageName = progressData.filesRemaining[progressData.filesRemaining.length - 1]
-    const imageDestination = `./${distinationDirectory}/${imageName}`;
+    const imageDestination = `./${destinationDirectory}/${imageName}`;
     const currentImageLocation = `./${sourceDirectory}/${imageName}`;
 
     if (fs.existsSync(currentImageLocation)) {
@@ -85,7 +85,7 @@ async function processImages() {
         ctx.drawImage(image, 0, 0);
         ctx.fillStyle = color + convertToHex(transparency);
         ctx.font = font
-        ctx.rotate(rotation * Math.PI / 180);
+        rotate(ctx, dimensions, rotation);
         var textData = ctx.measureText(text);
         ctx.fillText(text, (dimensions.width / 2 - textData.width / 2) + xOffset, (dimensions.height / 2 + (textData.actualBoundingBoxAscent -  textData.actualBoundingBoxDescent) / 2) + yOffset);
         fs.writeFileSync(imageDestination, canvas.toBuffer('image/jpeg')); 
@@ -104,6 +104,12 @@ async function processImages() {
       progressData.filesErrored.push(progressData.filesRemaining.pop());
     }
   }
+}
+
+function rotate(ctx, dimensions, rotation) {
+  ctx.translate(dimensions.width / 2, dimensions.height / 2);
+  ctx.rotate(rotation * Math.PI / 180);
+  ctx.translate(-dimensions.width / 2, -dimensions.height / 2);
 }
 
 function resetProgressLogs() {

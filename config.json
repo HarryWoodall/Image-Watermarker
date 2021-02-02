@@ -10,7 +10,7 @@
     "sourceDirectory": "Images",
     "destinationDirectory": "Destination"
   },
-  "resetLogs": true,
+  "resetLogs": false,
   "overideFiles": false,
   "files": []
 }
