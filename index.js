@@ -61,8 +61,9 @@ if (progressData.filesRemaining.length > 0) {
   .then(() => {
     progressData = JSON.parse(fs.readFileSync('./logs.json')); 
     console.log(`Batches taken: ${progressData.batchNo}`);
-    console.log(`Items processed: ${progressData.filesDone}`);
+    console.log(`Items processed: ${progressData.filesDone.length}`);
     console.log(`Time of last batch ${Math.abs((new Date() - startTime) / 1000)} seconds`);
+    
     if (progressData.filesErrored.length) {
       progressData.filesErrored.forEach(file => {
         console.log(`ERROR: File ${file} was skipped, please check manually`);
