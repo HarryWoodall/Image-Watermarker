@@ -26,6 +26,8 @@ The data for the watermark, the fields are:
  - `xOffset`: displacement of x position
  - `yOffset`: displacement of y position
  - `rotation`: rotation around text center (set to 'auto' for corner to corner rotation)
+ - `relativeFontSize`: (boolean) will change font size depending on the image width
+ - `baseWidth`: if `relativeFontSize` is true, this will act as a base ratio.
  - `sourceDirectory`: the directory for the source files
  - `destinationDirectory`: the directory the watermarked files will be output to.
  
