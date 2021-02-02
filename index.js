@@ -91,7 +91,7 @@ async function processImages() {
         ctx.font = font
         const textData = ctx.measureText(text);
         const textPosition = setPosition(textData, dimensions);
-        rotate(ctx, textPosition, textData);
+        rotate(ctx, textPosition, textData, dimensions);
         ctx.fillText(text,textPosition[0], textPosition[1]);
         fs.writeFileSync(imageDestination, canvas.toBuffer('image/jpeg')); 
         console.log(`${imageName} processed`);
@@ -111,10 +111,15 @@ async function processImages() {
   }
 }
 
-function rotate(ctx, position, textData) {
-  ctx.translate(position[0] + textData.width / 2, position[1] - (textData.actualBoundingBoxAscent -  textData.actualBoundingBoxDescent) / 2);
-  ctx.rotate(rotation * Math.PI / 180);
-  ctx.translate(-(position[0] + textData.width / 2), -(position[1] - (textData.actualBoundingBoxAscent -  textData.actualBoundingBoxDescent) / 2));
+function rotate(ctx, position, textData, dimensions) {
+  let rotationValue = rotation;
+  if (rotation.toLowerCase() == "auto") {
+    rotationValue = Math.atan(dimensions.height / dimensions.width) * (180 / Math.PI);
+  }
+
+  ctx.translate(position[0] + textData.width / 2, position[1] - (textData.actualBoundingBoxAscent + textData.actualBoundingBoxDescent) / 2);
+  ctx.rotate(rotationValue * Math.PI / 180);
+  ctx.translate(-(position[0] + textData.width / 2), -(position[1] - (textData.actualBoundingBoxAscent + textData.actualBoundingBoxDescent) / 2));
 }
 
 function setPosition(textData, dimensions) {

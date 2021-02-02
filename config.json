@@ -9,11 +9,11 @@
     "verticalPadding": 10,
     "xOffset": 0,
     "yOffset": 0,
-    "rotation": 0,
+    "rotation": "0",
     "sourceDirectory": "Images",
     "destinationDirectory": "Destination"
   },
-  "resetLogs": true,
+  "resetLogs": false,
   "overideFiles": false,
   "files": []
 }
