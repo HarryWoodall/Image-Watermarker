@@ -81,9 +81,8 @@ async function processImages() {
       const dimensions = sizeOf(currentImageLocation);
       const canvas = createCanvas(dimensions.width, dimensions.height);
       const ctx = canvas.getContext('2d');
-
+      
       let imageFont = font;
-
       if (config.data.relativeFontSize) {
         imageFont = setFontSize(dimensions);
       }

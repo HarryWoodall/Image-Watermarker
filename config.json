@@ -12,7 +12,7 @@
     "rotation": 0,
     "relativeFontSize": false,
     "baseWidth": 600,
-    "sourceDirectory": "TestImages",
+    "sourceDirectory": "Images",
     "destinationDirectory": "Destination"
   },
   "resetLogs": false,
