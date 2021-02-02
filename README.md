@@ -25,7 +25,7 @@ The data for the watermark, the fields are:
  - `verticalPadding`: padding of text relative to a vertical edge
  - `xOffset`: displacement of x position
  - `yOffset`: displacement of y position
- - `rotation`: rotation around text center
+ - `rotation`: rotation around text center (set to 'auto' for corner to corner rotation)
  - `sourceDirectory`: the directory for the source files
  - `destinationDirectory`: the directory the watermarked files will be output to.
  
