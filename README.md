@@ -20,6 +20,9 @@ The data for the watermark, the fields are:
  - `color`: hex code of colour of watermark
  - `transparency`: percent transparency value with 100 being completly transparent and 0 being no transparency.
  - `text`: text value of watermark
+ - `position`: position of text
+ - `horizontalPadding`: padding of text relative to a horizontal edge
+ - `verticalPadding`: padding of text relative to a vertical edge
  - `xOffset`: displacement of x position
  - `yOffset`: displacement of y position
  - `rotation`: rotation around text center
@@ -30,3 +33,13 @@ The data for the watermark, the fields are:
  - `reset logs`: (boolean) will reset logs before start of run, (will overide previously processed images)
  - `overideFiles`: (boolean) will only process images located in `files`
  - `files`: whitelist of images contained in `sourceDirectory` that you wish to process. (file extention can be ommited as it assumes all files are .jpgs)
+ 
+## Position
+The position modifier can be used to easily change the position of the text, the values it takes are: 
+ - `CENTER`
+ - `TOP`
+ - `BOTTOM`
+ - `LEFT`
+ - `RIGHT`
+ 
+These values can be strung together seperated by a space, e.g. `TOP RIGHT` or `CENTER BOTTOM`
