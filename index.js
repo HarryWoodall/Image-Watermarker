@@ -43,7 +43,7 @@ if (config.overideFiles) {
 }
 
 // Setup
-const progressData = JSON.parse(fs.readFileSync('./logs.json')); 
+let progressData = JSON.parse(fs.readFileSync('./logs.json')); 
 if (progressData.filesRemaining.length <= 0 && progressData.filesDone.length <= 0) {
   progressData.filesRemaining = fs.readdirSync(`./${sourceDirectory}`);
   fs.writeFileSync('./logs.json', JSON.stringify(progressData, false, 2));
@@ -59,7 +59,9 @@ if (progressData.filesRemaining.length > 0) {
   fs.writeFileSync('./logs.json', JSON.stringify(progressData, false, 2));
   processImages()
   .then(() => {
-    console.log(`Batches taken ${progressData.batchNo}`);
+    progressData = JSON.parse(fs.readFileSync('./logs.json')); 
+    console.log(`Batches taken: ${progressData.batchNo}`);
+    console.log(`Items processed: ${progressData.filesDone}`);
     console.log(`Time of last batch ${Math.abs((new Date() - startTime) / 1000)} seconds`);
     if (progressData.filesErrored.length) {
       progressData.filesErrored.forEach(file => {
