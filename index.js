@@ -54,8 +54,13 @@ if (progressData.fileInProgress) {
 }
 
 if (progressData.filesRemaining.length > 0) {
+  const startTime = new Date();
+  progressData.batchNo++;
+  fs.writeFileSync('./logs.json', JSON.stringify(progressData, false, 2));
   processImages()
   .then(() => {
+    console.log(`Batches taken ${progressData.batchNo}`);
+    console.log(`Time of last batch ${Math.abs((new Date() - startTime) / 1000)} seconds`);
     if (progressData.filesErrored.length) {
       progressData.filesErrored.forEach(file => {
         console.log(`ERROR: File ${file} was skipped, please check manually`);
@@ -83,8 +88,10 @@ async function processImages() {
       const ctx = canvas.getContext('2d');
       
       let imageFont = font;
+      let padding = [horizontalPadding, verticalPadding];
       if (config.data.relativeFontSize) {
         imageFont = setFontSize(dimensions);
+        padding= setPadding(dimensions);
       }
 
       progressData.fileInProgress = progressData.filesRemaining.pop();
@@ -93,15 +100,22 @@ async function processImages() {
       await loadImage(currentImageLocation).
       then((image) => {
         ctx.drawImage(image, 0, 0);
+
+        // Setup
         ctx.fillStyle = color + convertToHex(transparency);
-        ctx.font = imageFont
+        ctx.font = imageFont;
+        
+        // Transform
         const textData = ctx.measureText(text);
-        const textPosition = setPosition(textData, dimensions);
+        const textPosition = setPosition(textData, dimensions, padding);
         rotate(ctx, textPosition, textData, dimensions);
+
+        // Place watermark
         ctx.fillText(text,textPosition[0], textPosition[1]);
         fs.writeFileSync(imageDestination, canvas.toBuffer('image/jpeg')); 
         console.log(`${imageName} processed`);
 
+        // Update logs
         progressData.filesDone.push(progressData.fileInProgress);
         progressData.fileInProgress = "";
         fs.writeFileSync('./logs.json', JSON.stringify(progressData, false, 2));
@@ -119,7 +133,7 @@ async function processImages() {
 
 function rotate(ctx, position, textData, dimensions) {
   let rotationValue = rotation;
-  if (rotation instanceof String && rotation.toLowerCase() == "auto") {
+  if (typeof rotation === "string" && rotation.toLowerCase() == "auto") {
     rotationValue = Math.atan(dimensions.height / dimensions.width) * (180 / Math.PI);
   }
 
@@ -128,7 +142,7 @@ function rotate(ctx, position, textData, dimensions) {
   ctx.translate(-(position[0] + textData.width / 2), -(position[1] - (textData.actualBoundingBoxAscent + textData.actualBoundingBoxDescent) / 2));
 }
 
-function setPosition(textData, dimensions) {
+function setPosition(textData, dimensions, padding) {
   const textPositions = position.split(" ");
   let ords = [(dimensions.width / 2 - textData.width / 2) + xOffset, (dimensions.height / 2 + (textData.actualBoundingBoxAscent -  textData.actualBoundingBoxDescent) / 2) + yOffset];
   textPositions.forEach(item => {
@@ -136,16 +150,16 @@ function setPosition(textData, dimensions) {
       case "center":
         break;
       case "top":
-        ords[1] = 0 + textData.actualBoundingBoxAscent + yOffset + verticalPadding;
+        ords[1] = 0 + textData.actualBoundingBoxAscent + yOffset + padding[1];
         break;
       case "bottom":
-        ords[1] = dimensions.height - textData.actualBoundingBoxDescent - verticalPadding + yOffset;
+        ords[1] = dimensions.height - textData.actualBoundingBoxDescent - padding[1] + yOffset;
         break;
       case "left":
-        ords[0] = 0 + xOffset + horizontalPadding;
+        ords[0] = 0 + xOffset + padding[0];
         break;
       case "right":
-        ords[0] = dimensions.width - textData.width - horizontalPadding + xOffset;
+        ords[0] = dimensions.width - textData.width - padding[0] + xOffset;
         break;
     }
   });
@@ -155,6 +169,8 @@ function setPosition(textData, dimensions) {
 function resetProgressLogs() {
   console.log("resetting logs");
   let data = {
+    batchNo: 0,
+    batchStartTime: 0,
     filesRemaining: [],
     filesDone: [],
     fileInProgress: "",
@@ -181,8 +197,12 @@ function setFontSize(dimentions) {
   const canvasSize = dimentions.width * ratio;
 
   regex = /\d+px/
-  console.log(font.replace(regex, (canvasSize | 0) + 'px'));
   return font.replace(regex, (canvasSize | 0) + 'px');
+}
+
+function setPadding(dimentions) {
+  const ratio = dimentions.width / baseWidth;
+  return [horizontalPadding * ratio, verticalPadding * ratio];
 }
 
 function setFiles(files) {
@@ -196,6 +216,8 @@ function setFiles(files) {
     });
     console.log(files);
     let data = {
+      batchNo: 0,
+      batchStartTime: 0,
       filesRemaining: files,
       filesDone: [],
       fileInProgress: "",
