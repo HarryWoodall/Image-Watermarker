@@ -1,6 +1,7 @@
 fs = require('fs');
 const sizeOf = require('image-size');
 const { createCanvas, loadImage } = require('canvas');
+const { off } = require('process');
 const prompt = require('prompt-sync')();
 
 //Config
@@ -14,6 +15,9 @@ const font = config.data.font;
 const color = config.data.color;
 const transparency = config.data.transparency;
 const text = config.data.text;
+const position = config.data.position;
+const horizontalPadding = config.data.horizontalPadding;
+const verticalPadding = config.data.verticalPadding;
 const xOffset = config.data.xOffset;
 const yOffset = config.data.yOffset;
 const rotation = config.data.rotation;
@@ -85,9 +89,10 @@ async function processImages() {
         ctx.drawImage(image, 0, 0);
         ctx.fillStyle = color + convertToHex(transparency);
         ctx.font = font
-        rotate(ctx, dimensions, rotation);
-        var textData = ctx.measureText(text);
-        ctx.fillText(text, (dimensions.width / 2 - textData.width / 2) + xOffset, (dimensions.height / 2 + (textData.actualBoundingBoxAscent -  textData.actualBoundingBoxDescent) / 2) + yOffset);
+        rotate(ctx, dimensions, [xOffset, yOffset], rotation);
+        const textData = ctx.measureText(text);
+        const textPosition = setPosition(textData, dimensions);
+        ctx.fillText(text,textPosition[0], textPosition[1]);
         fs.writeFileSync(imageDestination, canvas.toBuffer('image/jpeg')); 
         console.log(`${imageName} processed`);
 
@@ -106,10 +111,34 @@ async function processImages() {
   }
 }
 
-function rotate(ctx, dimensions, rotation) {
-  ctx.translate(dimensions.width / 2, dimensions.height / 2);
+function rotate(ctx, dimensions, offsets, rotation) {
+  ctx.translate((dimensions.width / 2) + offsets[0], (dimensions.height / 2) + offsets[1]);
   ctx.rotate(rotation * Math.PI / 180);
-  ctx.translate(-dimensions.width / 2, -dimensions.height / 2);
+  ctx.translate(-((dimensions.width / 2) + offsets[0]), -((dimensions.height / 2) + offsets[1]));
+}
+
+function setPosition(textData, dimensions) {
+  const textPositions = position.split(" ");
+  let ords = [(dimensions.width / 2 - textData.width / 2) + xOffset, (dimensions.height / 2 + (textData.actualBoundingBoxAscent -  textData.actualBoundingBoxDescent) / 2) + yOffset];
+  textPositions.forEach(item => {
+    switch (item.toLowerCase()) {
+      case "center":
+        break;
+      case "top":
+        ords[1] = 0 + textData.actualBoundingBoxAscent + yOffset + verticalPadding;
+        break;
+      case "bottom":
+        ords[1] = dimensions.height - textData.actualBoundingBoxDescent - verticalPadding + yOffset;
+        break;
+      case "left":
+        ords[0] = 0 + xOffset + horizontalPadding;
+        break;
+      case "right":
+        ords[0] = dimensions.width - textData.width - horizontalPadding + xOffset;
+        break;
+    }
+  });
+  return ords;
 }
 
 function resetProgressLogs() {

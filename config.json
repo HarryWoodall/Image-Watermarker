@@ -4,13 +4,16 @@
     "color": "#ffffff",
     "transparency": 60,
     "text": "Stockport Council",
+    "position": "CENTER",
+    "horizontalPadding": 10,
+    "verticalPadding": 10,
     "xOffset": 0,
     "yOffset": 0,
     "rotation": 0,
     "sourceDirectory": "Images",
     "destinationDirectory": "Destination"
   },
-  "resetLogs": false,
+  "resetLogs": true,
   "overideFiles": false,
   "files": []
 }
