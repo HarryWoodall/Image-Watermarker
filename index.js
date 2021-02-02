@@ -12,6 +12,7 @@ if (!config) {
 }
 
 const font = config.data.font;
+const baseWidth = config.data.baseWidth;
 const color = config.data.color;
 const transparency = config.data.transparency;
 const text = config.data.text;
@@ -81,6 +82,12 @@ async function processImages() {
       const canvas = createCanvas(dimensions.width, dimensions.height);
       const ctx = canvas.getContext('2d');
 
+      let imageFont = font;
+
+      if (config.data.relativeFontSize) {
+        imageFont = setFontSize(dimensions);
+      }
+
       progressData.fileInProgress = progressData.filesRemaining.pop();
       fs.writeFileSync('./logs.json', JSON.stringify(progressData, false, 2));
       
@@ -88,7 +95,7 @@ async function processImages() {
       then((image) => {
         ctx.drawImage(image, 0, 0);
         ctx.fillStyle = color + convertToHex(transparency);
-        ctx.font = font
+        ctx.font = imageFont
         const textData = ctx.measureText(text);
         const textPosition = setPosition(textData, dimensions);
         rotate(ctx, textPosition, textData, dimensions);
@@ -113,7 +120,7 @@ async function processImages() {
 
 function rotate(ctx, position, textData, dimensions) {
   let rotationValue = rotation;
-  if (rotation.toLowerCase() == "auto") {
+  if (rotation instanceof String && rotation.toLowerCase() == "auto") {
     rotationValue = Math.atan(dimensions.height / dimensions.width) * (180 / Math.PI);
   }
 
@@ -164,8 +171,19 @@ function convertToHex(number) {
   } else {
     number = 100 - number;
     const normalizedValue = Math.round(number / 100 * 255);
-    return normalizedValue.toString(16);
+    return normalizedValue.toString(16).length < 2 ? `0${normalizedValue.toString(16)}` : normalizedValue.toString(16);
   }
+}
+
+function setFontSize(dimentions) {
+  let regex = /\D/g;
+  const fontSize = font.replace(regex, "");
+  const ratio = fontSize / baseWidth;
+  const canvasSize = dimentions.width * ratio;
+
+  regex = /\d+px/
+  console.log(font.replace(regex, (canvasSize | 0) + 'px'));
+  return font.replace(regex, (canvasSize | 0) + 'px');
 }
 
 function setFiles(files) {
