@@ -22,7 +22,7 @@ The data for the watermark, the fields are:
  - `text`: text value of watermark
  - `xOffset`: displacement of x position
  - `yOffset`: displacement of y position
- - `rotation`: rotation around 0,0 (very fiddely, not recomended for use)
+ - `rotation`: rotation around text center
  - `sourceDirectory`: the directory for the source files
  - `destinationDirectory`: the directory the watermarked files will be output to.
  
